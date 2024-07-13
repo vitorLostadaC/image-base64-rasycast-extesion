@@ -1,4 +1,4 @@
-import { Form, ActionPanel, Action, showToast, Detail, Toast, Icon } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Detail, Toast, Icon, Color } from "@raycast/api";
 import { useState } from "react";
 import fs from "fs";
 import path from "path";
@@ -8,6 +8,7 @@ import { getImageDimensionsFromBase64 } from "./libs/imageUtils";
 
 type Values = {
   base64: string;
+  outputFormat: string;
 };
 
 interface Image {
@@ -22,7 +23,7 @@ interface Image {
 export default function Base64ToImage() {
   const [image, setImage] = useState<Image | null>(null);
 
-  function handleSubmit({ base64 }: Values) {
+  async function handleSubmit({ base64, outputFormat }: Values) {
     if (!base64) {
       showToast({
         title: "Error",
@@ -46,25 +47,34 @@ export default function Base64ToImage() {
     let extension: string;
 
     if (!base64.startsWith("data:image/")) {
-      imageData = `data:image/png;base64,${base64}`;
-      extension = "png";
+      imageData = `data:image/${outputFormat};base64,${base64}`;
+      extension = outputFormat;
     } else {
       imageData = base64.replaceAll('"', "");
-      extension = base64.split(",")[0].split("/")[1];
+      extension = outputFormat || base64.split(",")[0].split("/")[1];
     }
 
-    setImage({
-      image: imageData,
-      extension: extension,
-      size: getImageDimensionsFromBase64(base64) ?? { width: 0, height: 0 },
-    });
+    try {
+      const dimensions = await getImageDimensionsFromBase64(base64);
+      setImage({
+        image: imageData,
+        extension: extension,
+        size: dimensions || { width: 0, height: 0 },
+      });
+    } catch (error) {
+      showToast({
+        title: "Error",
+        message: "Unsupported image format or invalid base64 string",
+        style: Toast.Style.Failure,
+      });
+    }
   }
 
   function handleDownload() {
     if (!image) return;
 
     const downloadsPath = path.join(os.homedir(), "Downloads");
-    const fileName = `image_${Date.now()}.png`;
+    const fileName = `image_${Date.now()}.${image.extension}`;
     const filePath = path.join(downloadsPath, fileName);
 
     const base64Data = image.image.replace(/^data:image\/\w+;base64,/, "");
@@ -109,7 +119,7 @@ export default function Base64ToImage() {
             </ActionPanel.Section>
             <ActionPanel.Section>
               <Action.CopyToClipboard
-                title="Copy Image"
+                title="Copy Image Base64"
                 content={image.image}
                 shortcut={{ modifiers: ["cmd"], key: "c" }}
               />
@@ -123,8 +133,8 @@ export default function Base64ToImage() {
             <Detail.Metadata.Label title="Size" text={`${image.size.width}x${image.size.height}`} />
             <Detail.Metadata.Separator />
             <Detail.Metadata.TagList title="Actions">
-              <Detail.Metadata.TagList.Item text="Download" color={"#007AFF"} />
-              <Detail.Metadata.TagList.Item text="Copy" color={"#32D74B"} />
+              <Detail.Metadata.TagList.Item text="Download" color={Color.Blue} />
+              <Detail.Metadata.TagList.Item text="Copy Base64" color={Color.Green} />
             </Detail.Metadata.TagList>
           </Detail.Metadata>
         }
@@ -140,7 +150,17 @@ export default function Base64ToImage() {
         </ActionPanel>
       }
     >
-      <Form.TextArea id="base64" title="Base 64" placeholder="Paste your base64 image here" />
+      <Form.TextArea
+        id="base64"
+        title="Base64"
+        placeholder="Paste your base64 image here or drag and drop a text file"
+        info="You can also drag and drop a text file containing the base64 string"
+      />
+      <Form.Dropdown id="outputFormat" title="Output Format" defaultValue="png">
+        <Form.Dropdown.Item value="png" title="PNG" />
+        <Form.Dropdown.Item value="jpeg" title="JPEG" />
+        <Form.Dropdown.Item value="webp" title="WebP" />
+      </Form.Dropdown>
     </Form>
   );
 }
