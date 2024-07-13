@@ -2,11 +2,16 @@ import { Form, ActionPanel, Action, showToast, Detail, Toast, Icon, Clipboard } 
 import { useState } from "react";
 import fs from "fs";
 import path from "path";
+import { getImageDimensionsFromBase64 } from "./libs/imageUtils";
 
 interface Image {
   base64: string;
   fileName: string;
   size: number;
+  dimensions: {
+    width: number;
+    height: number;
+  };
 }
 
 export default function ImageToBase64() {
@@ -29,10 +34,13 @@ export default function ImageToBase64() {
       const fileName = path.basename(filePath);
       const stats = fs.statSync(filePath);
 
+      const base64 = `data:image/${path.extname(filePath).slice(1)};base64,${base64String}`;
+
       setImage({
-        base64: `data:image/${path.extname(filePath).slice(1)};base64,${base64String}`,
+        base64,
         fileName: fileName,
         size: stats.size,
+        dimensions: getImageDimensionsFromBase64(base64) ?? { width: 0, height: 0 },
       });
     } catch (error) {
       showToast({
@@ -78,6 +86,8 @@ export default function ImageToBase64() {
         metadata={
           <Detail.Metadata>
             <Detail.Metadata.Label title="File Name" text={image.fileName} />
+            <Detail.Metadata.Separator />
+            <Detail.Metadata.Label title="Dimensions" text={`${image.dimensions.width}x${image.dimensions.height}`} />
             <Detail.Metadata.Separator />
             <Detail.Metadata.Label title="Size" text={`${(image.size / 1024).toFixed(2)} KB`} />
             <Detail.Metadata.Separator />

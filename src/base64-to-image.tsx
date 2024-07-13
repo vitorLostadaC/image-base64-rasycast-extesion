@@ -3,8 +3,7 @@ import { useState } from "react";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { isValidBase64 } from "./libs/base64";
-import { getImageDimensionsFromBase64 } from "./libs/imageUtils";
+import { calculateBase64Size, getImageDimensionsFromBase64, isValidBase64 } from "./libs/imageUtils";
 
 type Values = {
   base64: string;
@@ -14,7 +13,8 @@ type Values = {
 interface Image {
   image: string;
   extension: string;
-  size: {
+  size: number;
+  dimensions: {
     width: number;
     height: number;
   };
@@ -55,11 +55,12 @@ export default function Base64ToImage() {
     }
 
     try {
-      const dimensions = await getImageDimensionsFromBase64(base64);
+      const dimensions = getImageDimensionsFromBase64(base64);
       setImage({
         image: imageData,
         extension: extension,
-        size: dimensions || { width: 0, height: 0 },
+        dimensions: dimensions || { width: 0, height: 0 },
+        size: calculateBase64Size(base64),
       });
     } catch (error) {
       showToast({
@@ -130,7 +131,9 @@ export default function Base64ToImage() {
           <Detail.Metadata>
             <Detail.Metadata.Label title="Format" text={image.extension.toUpperCase()} />
             <Detail.Metadata.Separator />
-            <Detail.Metadata.Label title="Size" text={`${image.size.width}x${image.size.height}`} />
+            <Detail.Metadata.Label title="Dimensions" text={`${image.dimensions.width}x${image.dimensions.height}`} />
+            <Detail.Metadata.Separator />
+            <Detail.Metadata.Label title="Size" text={`${(image.size / 1024).toFixed(2)} KB`} />
             <Detail.Metadata.Separator />
             <Detail.Metadata.TagList title="Actions">
               <Detail.Metadata.TagList.Item text="Download" color={Color.Blue} />
