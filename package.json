@@ -1,8 +1,8 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "base64-to-image",
-  "title": "Base64 to Image",
-  "description": "Convert any base64 to image",
+  "name": "base64-image-converter",
+  "title": "Base64 Image Converter",
+  "description": "Convert between base64 strings and images easily",
   "icon": "command-icon.png",
   "author": "vitorlostada",
   "categories": [
@@ -13,9 +13,15 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "index",
+      "name": "base64-to-image",
       "title": "Base64 to Image",
-      "description": "Convert any base64 to image",
+      "description": "Convert base64 to image",
+      "mode": "view"
+    },
+    {
+      "name": "image-to-base64",
+      "title": "Image to Base64",
+      "description": "Convert image to base64",
       "mode": "view"
     }
   ],

@@ -1,3 +1,9 @@
-# Base64 to Image
+# Base64 and Image Converter
 
-Convert any base64 to image
+Convert between base64 strings and images easily.
+
+## Features
+
+- Convert base64 strings to images
+- Convert images to base64 strings
+- Download images to your Downloads folder
