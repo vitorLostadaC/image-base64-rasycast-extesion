@@ -149,14 +149,14 @@ export default function Base64ToImage() {
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm onSubmit={handleSubmit} />
+          <Action.SubmitForm title="Convert to Image" onSubmit={handleSubmit} />
         </ActionPanel>
       }
     >
       <Form.TextArea
         id="base64"
         title="Base64"
-        placeholder="Paste your base64 image here or drag and drop a text file"
+        placeholder="Paste your base64 image here"
         info="You can also drag and drop a text file containing the base64 string"
       />
       <Form.Dropdown id="outputFormat" title="Output Format" defaultValue="png">

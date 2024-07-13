@@ -104,7 +104,7 @@ export default function ImageToBase64() {
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm onSubmit={handleSubmit} />
+          <Action.SubmitForm title="Convert to Base64" onSubmit={handleSubmit} />
         </ActionPanel>
       }
     >
