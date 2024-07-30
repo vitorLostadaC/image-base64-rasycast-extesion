@@ -1,9 +1,16 @@
-# Base64 to Image Changelog
+# base64 Changelog
 
-## [Initial Version] - 2024-07-13
+## [Update] - 2024-03-14
 
-- Convert base64 to image
-- Convert image to base64
-- Download image
-- Copy base64
-- Image info
+- Added Base64 to Image conversion
+- Added Image to Base64 conversion
+- Implemented image download functionality
+- Included image information display (dimensions, size, format)
+- Named from "encode" to "text-to-base64"
+- Named from "decode" to "base64-to-text"
+- Removed index
+
+## [Update] - 2022-12-14
+
+- Updated extension to newest API
+- Added new command
