@@ -1,6 +1,6 @@
-# Base64 to Image Changelog
+# base64 Changelog
 
-## [Initial Version] - 2024-07-11
+ ## [Update] - 2022-12-14
 
-- Convert base64 to image
-- Download image
+ - Updated extension to newest API
+ - Added new command
