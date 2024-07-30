@@ -3,9 +3,6 @@
   "name": "base64",
   "title": "Base64",
   "description": "Quickly encode or decode base64 from the clipboard",
-  "name": "base64",
-  "title": "Base64",
-  "description": "Quickly encode or decode base64 from the clipboard",
   "icon": "command-icon.png",
   "author": "DanielSinclair",
   "contributors": [
@@ -37,6 +34,18 @@
       "title": "Image to Base64",
       "description": "Convert image to base64",
       "mode": "view"
+    },
+    {
+      "name": "encode",
+      "title": "Base64 Encode",
+      "description": "Overwrite the clipboard contents with an encoded string",
+      "mode": "no-view"
+    },
+    {
+      "name": "decode",
+      "title": "Base64 Decode",
+      "description": "Overwrite the clipboard contents with a decoded string",
+      "mode": "no-view"
     }
   ],
   "preferences": [
