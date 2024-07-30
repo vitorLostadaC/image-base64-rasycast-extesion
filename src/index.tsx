@@ -1,91 +1,92 @@
-import { Form, ActionPanel, Action, showToast, Detail, Toast } from "@raycast/api";
-import { useState } from "react";
-import fs from "fs";
-import path from "path";
-import os from "os";
+import React from "react";
+import { List, ActionPanel, Action, Clipboard, Icon, getPreferenceValues } from "@raycast/api";
 
-type Values = {
-  base64: string;
-};
+enum DefaultActionPreference {
+  CopyToClipboard = "copyToClipboard",
+  PasteInApp = "pasteInApp",
+  OpenInBrowser = "openInBrowser",
+}
+interface Preferences {
+  defaultAction?: DefaultActionPreference;
+}
+
+interface ActionsOpts {
+  value: string;
+}
+function _getActions({ value }: ActionsOpts) {
+  const isValidUrl = value && value.startsWith("http");
+  const defaultPreference = getPreferenceValues<Preferences>().defaultAction;
+  const ACTIONS = [
+    <Action.CopyToClipboard key={DefaultActionPreference.CopyToClipboard} content={value} />,
+    <Action.Paste key={DefaultActionPreference.PasteInApp} content={value} />,
+    isValidUrl ? <Action.OpenInBrowser key={DefaultActionPreference.OpenInBrowser} url={value} /> : null,
+  ].filter(Boolean) as React.ReactElement[];
+  const defaultAction = ACTIONS.find((action) => action.key === defaultPreference);
+  const otherActions = ACTIONS.filter((action) => action.key !== defaultPreference);
+  return (
+    <ActionPanel>
+      <>
+        {defaultAction}
+        {otherActions}
+      </>
+    </ActionPanel>
+  );
+}
 
 export default function Command() {
-  const [image, setImage] = useState<string | null>(null);
-
-  function handleSubmit({ base64 }: Values) {
-    if (!base64) {
-      showToast({ title: "Error", message: "Please enter a base64 string", style: Toast.Style.Failure });
-      return;
-    }
-
-    function isValidBase64(str: string): boolean {
-      if (!str) return false;
-      const base64Regex = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
-      return base64Regex.test(str);
-    }
-
-    const cleanedBase64 = base64.replaceAll('"', "").split(",").pop() || "";
-    if (!isValidBase64(cleanedBase64)) {
-      showToast({
-        title: "Error",
-        message: "Invalid base64 string. Please check your input.",
-        style: Toast.Style.Failure,
-      });
-      return;
-    }
-
-    let imageData: string;
-
-    if (!base64.startsWith("data:image/")) {
-      imageData = `data:image/png;base64,${base64}`;
-    } else {
-      imageData = base64.replaceAll('"', "");
-    }
-
-    setImage(imageData);
-  }
-
-  function handleDownload() {
-    if (!image) return;
-
-    const downloadsPath = path.join(os.homedir(), "Downloads");
-    const fileName = `image_${Date.now()}.png`;
-    const filePath = path.join(downloadsPath, fileName);
-
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
-    const buffer = Buffer.from(base64Data, "base64");
-
-    fs.writeFile(filePath, buffer, (err) => {
-      if (err) {
-        showToast({ title: "Error", message: "Failed to download image", style: Toast.Style.Failure });
-      } else {
-        showToast({ title: "Success", message: `Image downloaded to ${filePath}`, style: Toast.Style.Success });
-      }
+  const [clipboardText, setClipboardText] = React.useState<string | undefined>(undefined);
+  const [input, setInput] = React.useState(clipboardText);
+  const [encoded, setEncoded] = React.useState<string | undefined>(undefined);
+  const [decoded, setDecoded] = React.useState<string | undefined>(undefined);
+  React.useEffect(() => {
+    Clipboard.readText().then((clipboardContents) => {
+      setClipboardText(clipboardContents);
     });
-  }
-
-  if (image) {
-    return (
-      <Detail
-        markdown={`![Converted Image](${image})`}
-        actions={
-          <ActionPanel>
-            <Action title="Convert Another" onAction={() => setImage(null)} />
-            <Action title="Download Image" onAction={handleDownload} />
-          </ActionPanel>
-        }
-      />
-    );
-  }
+  }, []);
+  React.useEffect(() => {
+    const _input = input || clipboardText;
+    if (_input) {
+      setDecoded(Buffer.from(_input, "base64").toString("utf8"));
+      setEncoded(Buffer.from(_input, "utf8").toString("base64"));
+    } else {
+      setDecoded(undefined);
+      setEncoded(undefined);
+    }
+  }, [input, clipboardText]);
 
   return (
-    <Form
-      actions={
-        <ActionPanel>
-          <Action.SubmitForm onSubmit={handleSubmit} />
-        </ActionPanel>
-      }
+    <List
+      onSearchTextChange={(newValue) => {
+        setInput(newValue || clipboardText);
+      }}
+      searchBarPlaceholder={"Text to encode / decode..."}
     >
-      <Form.TextArea id="base64" title="Base 64" placeholder="Paste your base64 image here" />
-    </Form>
+      {encoded && decoded ? (
+        <>
+          <List.Section title={`Input: ${input || clipboardText}`}>
+            <List.Item
+              key={"encode"}
+              icon={Icon.CodeBlock}
+              title={"Encode"}
+              subtitle={encoded}
+              actions={encoded ? _getActions({ value: encoded }) : undefined}
+            />
+            <List.Item
+              key={"decode"}
+              icon={Icon.Code}
+              title={"Decode"}
+              subtitle={decoded}
+              actions={decoded ? _getActions({ value: decoded }) : undefined}
+            />
+          </List.Section>
+        </>
+      ) : (
+        <List.EmptyView
+          icon={Icon.QuestionMarkCircle}
+          title={"Nothing to Encode / Decode"}
+          description={"Copy some content to your clipboard, or start typing text to encode or decode."}
+        />
+      )}
+    </List>
   );
 }
