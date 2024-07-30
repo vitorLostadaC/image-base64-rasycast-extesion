@@ -1,5 +1,7 @@
 # base64 Changelog
 
+# base64 Changelog
+
 ## [Update] - 2024-03-14
 
 - Added Base64 to Image conversion

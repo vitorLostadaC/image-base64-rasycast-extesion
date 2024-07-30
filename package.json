@@ -3,6 +3,9 @@
   "name": "base64",
   "title": "Base64",
   "description": "Quickly encode or decode base64 from the clipboard",
+  "name": "base64",
+  "title": "Base64",
+  "description": "Quickly encode or decode base64 from the clipboard",
   "icon": "command-icon.png",
   "author": "DanielSinclair",
   "contributors": [
@@ -65,12 +68,14 @@
     "js-base64": "3.7.7"
   },
   "devDependencies": {
-    "@raycast/eslint-config": "^1.0.8",
-    "@types/node": "20.8.10",
-    "@types/react": "18.3.3",
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "@types/node": "16.11.7",
+    "@types/react": "17.0.34",
+    "@typescript-eslint/eslint-plugin": "5.3.1",
+    "@typescript-eslint/parser": "5.3.1",
+    "eslint": "8.2.0",
+    "eslint-config-prettier": "8.3.0",
+    "react-devtools": "4.21.0",
+    "typescript": "4.4.4"
   },
   "scripts": {
     "build": "ray build -e dist",
