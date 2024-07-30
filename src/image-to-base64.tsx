@@ -1,8 +1,9 @@
-import { Form, ActionPanel, Action, showToast, Detail, Toast, Icon, Clipboard } from "@raycast/api";
+import { Form, ActionPanel, Action, showToast, Detail, Toast, Icon } from "@raycast/api";
 import { useState } from "react";
 import fs from "fs";
 import path from "path";
-import { getImageDimensionsFromBase64 } from "./libs/imageUtils";
+import { getImageDimensionsFromBase64 } from "./util/image-utils";
+import { update } from "./util/clipboard";
 
 interface Image {
   base64: string;
@@ -53,12 +54,7 @@ export default function ImageToBase64() {
 
   const handleCopyToClipboard = async () => {
     if (!image) return;
-    await Clipboard.copy(image.base64);
-    showToast({
-      style: Toast.Style.Success,
-      title: "Success",
-      message: "Base64 string copied to clipboard",
-    });
+    await update(image.base64);
   };
 
   if (image) {

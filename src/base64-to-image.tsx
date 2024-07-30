@@ -3,7 +3,7 @@ import { useState } from "react";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { calculateBase64Size, getImageDimensionsFromBase64, isValidBase64 } from "./libs/imageUtils";
+import { calculateBase64Size, getImageDimensionsFromBase64, isValidBase64 } from "./util/image-utils";
 
 type Values = {
   base64: string;

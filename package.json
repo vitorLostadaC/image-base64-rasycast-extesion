@@ -1,15 +1,28 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "base64-image-converter",
-  "title": "Base64 Image Converter",
-  "description": "Convert between base64 strings and images easily",
+  "name": "base64",
+  "title": "Base64",
+  "description": "Quickly encode or decode base64 from the clipboard",
   "icon": "command-icon.png",
-  "author": "vitorlostada",
-  "categories": [
-    "Developer Tools"
+  "author": "DanielSinclair",
+  "contributors": [
+    "sammarks",
+    "vitorlostada"
   ],
   "license": "MIT",
   "commands": [
+    {
+      "name": "text-to-base64",
+      "title": "Text to Base64",
+      "description": "Convert text to base64",
+      "mode": "view"
+    },
+    {
+      "name": "base64-to-text",
+      "title": "Base64 to Text",
+      "description": "Decode a base64 string",
+      "mode": "view"
+    },
     {
       "name": "base64-to-image",
       "title": "Base64 to Image",
@@ -23,8 +36,33 @@
       "mode": "view"
     }
   ],
+  "preferences": [
+    {
+      "name": "defaultAction",
+      "description": "The default action to take when encoding / decoding a Base64 string.",
+      "type": "dropdown",
+      "required": false,
+      "title": "Default Action",
+      "default": "copyToClipboard",
+      "data": [
+        {
+          "value": "copyToClipboard",
+          "title": "Copy to Clipboard"
+        },
+        {
+          "value": "pasteInApp",
+          "title": "Paste in App"
+        },
+        {
+          "value": "openInBrowser",
+          "title": "Open in Browser"
+        }
+      ]
+    }
+  ],
   "dependencies": {
-    "@raycast/api": "^1.78.1"
+    "@raycast/api": "1.79.1",
+    "js-base64": "3.7.7"
   },
   "devDependencies": {
     "@raycast/eslint-config": "^1.0.8",
@@ -37,8 +75,8 @@
   "scripts": {
     "build": "ray build -e dist",
     "dev": "ray develop",
+    "publish": "npx @raycast/api@latest publish",
     "fix-lint": "ray lint --fix",
-    "lint": "ray lint",
-    "publish": "npx @raycast/api@latest publish"
+    "lint": "ray lint"
   }
 }
