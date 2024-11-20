@@ -26,3 +26,4 @@ declare namespace Arguments {
   export type ImageToBase64 = {}
 }
 
+
